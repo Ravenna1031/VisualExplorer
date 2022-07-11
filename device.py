@@ -10,6 +10,9 @@ class Device:
         self.screenshot_path = os.path.join("Output", "screenshot", self.serial)
         if not os.path.exists(self.screenshot_path):
             os.makedirs(self.screenshot_path)
+        self.tmp_path = os.path.join("tmp", self.serial)
+        if not os.path.exists(self.tmp_path):
+            os.makedirs(self.tmp_path)
 
     def connect(self):
         self.d = u2.connect(self.serial)
@@ -26,8 +29,19 @@ class Device:
         image = self.d.screenshot()
         image.save(image_path)
 
+    def dump_2nd(self):
+        """
+        Get the UI hierarchy dump content.
+        :return: UI hierarchy dump content.
+        """
+        path = os.path.join(self.tmp_path, "hierarchy.xml")
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(self.d.dump_hierarchy())
+        return path
+
 
 if __name__ == '__main__':
     dd = Device("emulator-5554")
     dd.connect()
-    dd.screenshot("test")
+    # dd.screenshot("test")
+    print(dd.dump_2nd())
