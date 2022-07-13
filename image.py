@@ -1,6 +1,5 @@
 import math
 import time
-
 import cv2
 
 
@@ -27,6 +26,10 @@ class Image:
         y_max = component.row_max
         cropped_img = cv2.imread(image)
         component_img = cropped_img[y_min:y_max, x_min:x_max]
+        component_img_height = component_img.shape[0]
+        component_img_width = component_img.shape[1]
+        component_img = cv2.resize(component_img, (int(component_img_width * 2.54), int(component_img_height * 2.54)),
+                                   interpolation=cv2.INTER_LINEAR)
         component_path = self.image_name_insert(image, int(time.time()))
         cv2.imwrite(component_path, component_img)
         return component_path
@@ -42,6 +45,6 @@ class Image:
 
 
 if __name__ == '__main__':
-    img_path = "D:\\Project\\Testing\\Image\\04.png"
+    img_path = "D:\\Project\\Testing\\Image\\05.png"
     img = Image(img_path)
     img.crop_init()
