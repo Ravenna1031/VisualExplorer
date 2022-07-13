@@ -3,7 +3,10 @@ import re
 
 class View:
     def __init__(self, element):
-        self.element = element
+        """
+        A view object in the 2nd gen layout.
+        :param element: An element read from the layout xml file.
+        """
         self.index = element.attrib["index"]
         self.text = element.attrib["text"]
         self.resource_id = element.attrib["resource-id"]
@@ -51,3 +54,28 @@ class View:
         print("selected: " + self.selected)
         print("visible_to_user: " + self.visible_to_user)
         print("bounds: " + self.bounds)
+
+
+class Component:
+    def __init__(self, element):
+        """
+        A component object from the 3rd gen detection.
+        :param element: A component read from the detection output json file.
+        """
+        self.id = element["id"]
+        self.class_name = element["class"]
+        self.column_min = element["column_min"]
+        self.row_min = element["row_min"]
+        self.column_max = element["column_max"]
+        self.row_max = element["row_max"]
+        self.width = element["width"]
+        self.height = element["height"]
+
+    def get_center(self):
+        """
+        Get the center coordinate of the detected component.
+        :return: The center coordinate.
+        """
+        center_x = (self.row_min + self.row_max) / 2
+        center_y = (self.column_min + self.column_max) / 2
+        return center_x, center_y
