@@ -1,4 +1,5 @@
 import math
+import time
 
 import cv2
 
@@ -16,9 +17,28 @@ class Image:
         crop_img = self.image[crop_start:crop_end, :]
         # cv2.imshow("cropped", corp_img)
         # cv2.waitKey(0)
-        pos_insert = self.path.find(".png")
-        corp_path = self.path[:pos_insert] + "_cropped" + self.path[pos_insert:]
+        corp_path = self.image_name_insert(self.path, "_cropped")
         cv2.imwrite(corp_path, crop_img)
+
+    def crop_component(self, image, component):
+        x_min = component.column_min
+        x_max = component.column_max
+        y_min = component.row_min
+        y_max = component.row_max
+        cropped_img = cv2.imread(image)
+        component_img = cropped_img[y_min:y_max, x_min:x_max]
+        component_path = self.image_name_insert(image, int(time.time()))
+        cv2.imwrite(component_path, component_img)
+        return component_path
+
+    @staticmethod
+    def image_name_insert(image, text):
+        assert image.endswith(".png") or image.endswith(".jpg"), "Not valid image format."
+        if image.endswith(".png"):
+            pos_insert = image.find(".png")
+        else:
+            pos_insert = image.find(".jpg")
+        return image[:pos_insert] + str(text) + image[pos_insert:]
 
 
 if __name__ == '__main__':

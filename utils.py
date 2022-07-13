@@ -1,3 +1,5 @@
+import os.path
+
 from view import View, Component
 import xml.etree.ElementTree as Et
 import json
@@ -23,11 +25,13 @@ class Utils:
         f.close()
         components = []
         for c in data["compos"]:
-            component = Component(c)
-            components.append(component)
+            if c["class"] == "Compo":
+                component = Component(c)
+                components.append(component)
+        # print(len(components))
         return components
 
 
 if __name__ == '__main__':
-    output = "D:\\Project\\Testing\\UIED\\data\\output\\ip\\02.json"
+    output = os.path.join("example", "result.json")
     Utils.get_all_visual_components(output)
