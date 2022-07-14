@@ -15,6 +15,10 @@ class Device:
             os.makedirs(self.tmp_path)
 
     def connect(self):
+        """
+        Connect the device.
+        :return:
+        """
         self.d = u2.connect(self.serial)
         self.connection = True
 
@@ -32,12 +36,13 @@ class Device:
     def dump_2nd(self):
         """
         Get the UI hierarchy dump content.
-        :return: UI hierarchy dump content.
+        :return: The path of the hierarchy xml file.
         """
         path = os.path.join(self.tmp_path, "hierarchy.xml")
         with open(path, "w", encoding="utf-8") as f:
             f.write(self.d.dump_hierarchy())
         return path
+
 
 
 if __name__ == '__main__':

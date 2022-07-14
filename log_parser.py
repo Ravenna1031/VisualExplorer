@@ -68,6 +68,15 @@ class LogParser:
 
     @staticmethod
     def position_distance(position, x_min, y_min, x_max, y_max):
+        """
+        The distance between two positions.
+        :param position: A tuple contains x and y coordinate of a motion event.
+        :param x_min: x_min value of a view.
+        :param y_min: y_min value of a view.
+        :param x_max: x_max value of a view.
+        :param y_max: y_max value of a view.
+        :return: The distance between.
+        """
         x_center = (x_min + x_max) / 2
         y_center = (y_min + y_max) / 2
         distance = math.sqrt((x_center - position[0]) ** 2 + (y_center - position[1]) ** 2)

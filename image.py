@@ -5,21 +5,33 @@ import cv2
 
 class Image:
     def __init__(self, path):
+        """
+        An image capture from the device to detect elements.
+        :param path: The path of the image.
+        """
         self.path = path
         self.image = cv2.imread(path)
         self.height = self.image.shape[0]
         self.width = self.image.shape[1]
 
     def crop_init(self):
+        """
+        Crop the top(status bar) and bottom(home button, etc.) of the image.
+        :return: None
+        """
         crop_start = math.floor(0.12 * self.height)
         crop_end = math.floor(0.92 * self.height)
         crop_img = self.image[crop_start:crop_end, :]
-        # cv2.imshow("cropped", corp_img)
-        # cv2.waitKey(0)
         corp_path = self.image_name_insert(self.path, "_cropped")
         cv2.imwrite(corp_path, crop_img)
 
     def crop_component(self, image, component):
+        """
+        Crop the image with the bounds of the input component.
+        :param image: The image to crop.
+        :param component: A randomly selected component to execute.
+        :return: The path of the cropped component image.
+        """
         x_min = component.column_min
         x_max = component.column_max
         y_min = component.row_min
@@ -36,6 +48,12 @@ class Image:
 
     @staticmethod
     def image_name_insert(image, text):
+        """
+        Insert a text in the original image name.
+        :param image: The path of the image.
+        :param text: Text to insert.
+        :return: The path of the inserted image.
+        """
         assert image.endswith(".png") or image.endswith(".jpg"), "Not valid image format."
         if image.endswith(".png"):
             pos_insert = image.find(".png")
