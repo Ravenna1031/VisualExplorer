@@ -60,9 +60,3 @@ class Image:
         else:
             pos_insert = image.find(".jpg")
         return image[:pos_insert] + str(text) + image[pos_insert:]
-
-
-if __name__ == '__main__':
-    img_path = "D:\\Project\\Testing\\Image\\05.png"
-    img = Image(img_path)
-    img.crop_init()

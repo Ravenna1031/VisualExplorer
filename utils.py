@@ -39,8 +39,3 @@ class Utils:
                 component = Component(c)
                 components.append(component)
         return components
-
-
-if __name__ == '__main__':
-    output = os.path.join("example", "result.json")
-    Utils.get_all_visual_components(output)

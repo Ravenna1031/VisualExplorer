@@ -44,17 +44,3 @@ class Device:
         with open(path, "w", encoding="utf-8") as f:
             f.write(self.d.dump_hierarchy())
         return path
-
-    # def logcat(self):
-    #     cmd = f"adb -s {self.serial} shell logcat"
-    #     output = subprocess.Popen(args=cmd, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
-    #     with output:
-    #         for line in output.stdout:
-    #             print(line)
-    #     return output
-
-
-if __name__ == '__main__':
-    dd = Device("emulator-5554")
-    dd.connect()
-    # dd.logcat()

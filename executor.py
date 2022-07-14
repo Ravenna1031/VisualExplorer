@@ -45,15 +45,3 @@ class Executor:
 
     class Layout:
         pass
-
-
-if __name__ == '__main__':
-    dd = Device("emulator-5554")
-    ev = Executor.Visual(dd)
-    ev.connect()
-    output = os.path.join("example", "result.json")
-    component = ev.random_select_component(output)
-    img_path = os.path.join("example", "result.jpg")
-    img = Image(img_path)
-    compo = img.crop_component(img_path, component)
-    ev.click(compo)

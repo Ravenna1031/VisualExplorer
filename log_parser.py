@@ -11,6 +11,10 @@ class LogParser:
     def __init__(self, device):
         self.device = device
         self.matcher_timestamp = r"^((?:1[0-2]|0?[1-9])-(?:0?[1-9]|[1-2]\d|30|31)) ((?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d.\d{3})"
+        self.hierarchy = None
+
+    def set_hierarchy(self, hierarchy):
+        self.hierarchy = hierarchy
 
     def get_motion_event(self, line):
         """
@@ -29,6 +33,7 @@ class LogParser:
             "position": position
         }
         logger.info(f"Motion Event: {result}")
+        self.view_calculate(result, self.hierarchy)
         return result
 
     @staticmethod
@@ -50,14 +55,14 @@ class LogParser:
                 res = re.search(matcher, i).group(1)
                 return res[:-1] if "," in res else res
 
-    def view_calculate(self, log, hierarchy):
+    def view_calculate(self, motion_event, hierarchy):
         """
         Calculate the interacted view in the hierarchy, with its bounds contain the position of the interaction.
-        :param log: The line of logcat contains the position of the interaction.
+        :param motion_event: Motion event object with timestamp and position.
         :param hierarchy: The xml hierarchy.
         :return: The calculated interacted view.
         """
-        motion_event = self.get_motion_event(log)
+        # motion_event = self.get_motion_event(log)
         position = motion_event["position"]
         views = Utils.get_all_views(hierarchy)
         min_val = math.inf
@@ -68,6 +73,9 @@ class LogParser:
                 if self.position_distance(position, x_min, y_min, x_max, y_max) < min_val:
                     view_cal = view
                     min_val = self.position_distance(position, x_min, y_min, x_max, y_max)
+        logger.info(
+            f"Calculated View: index={view_cal.index}, text={view_cal.text}, "
+            f"resource-id={view_cal.resource_id}, class={view_cal.class_name}")
         return view_cal
 
     @staticmethod
@@ -87,6 +95,12 @@ class LogParser:
         return distance
 
     def log_filter(self, tag, keywords):
+        """
+        Filter logs contain all the tag and keywords.
+        :param tag: The tag of the log.
+        :param keywords: Keywords to filter the log.
+        :return:
+        """
         self.log_clear()
         logger.info("Logcat Filter Start.")
         cmd = f"adb -s {self.device.serial} shell logcat"
@@ -99,6 +113,12 @@ class LogParser:
 
     @staticmethod
     def check_keywords(line, keywords):
+        """
+        Check if the line contains all the keywords.
+        :param line: One line from the log.
+        :param keywords: A list of keywords.
+        :return: If the line contains the keywords.
+        """
         if len(keywords) == 0:
             return True
         else:
