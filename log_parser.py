@@ -1,31 +1,35 @@
 import math
-import os
+import subprocess
+
+from loguru import logger
 import re
 from utils import Utils
+from device import Device
 
 
 class LogParser:
-    def __init__(self, tag):
-        self.tag = tag
-        self.matcher_timestamp = r"^(\d{1,4}-(?:1[0-2]|0?[1-9])-(?:0?[1-9]|[1-2]\d|30|31)) ((?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d.\d{3})"
+    def __init__(self, device):
+        self.device = device
+        self.matcher_timestamp = r"^((?:1[0-2]|0?[1-9])-(?:0?[1-9]|[1-2]\d|30|31)) ((?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d.\d{3})"
 
-    def get_motion_event(self, log):
+    def get_motion_event(self, line):
         """
         Get the timestamp and position of the motion event.
-        :param log: A line from logcat.
+        :param line: A line from logcat.
         :return: A dictionary contains info about the motion event.
         """
-        callback = "dispatchTouchEvent"
-        key = "MotionEvent"
-        position = tuple()
-        if callback in log and key in log:
-            obj = r"{ (.*) }"
-            res = re.search(obj, log).group(1)
-            pos_x = self.get_attribute(res, "x[0]")
-            pos_y = self.get_attribute(res, "y[0]")
-            position = (float(pos_x), float(pos_y))
-        timestamp = re.search(self.matcher_timestamp, log).group()
-        return {"timestamp": timestamp, "position": position}
+        obj = r"{ (.*) }"
+        res = re.search(obj, line).group(1)
+        pos_x = self.get_attribute(res, "x[0]")
+        pos_y = self.get_attribute(res, "y[0]")
+        position = (float(pos_x), float(pos_y))
+        timestamp = re.search(self.matcher_timestamp, line).group()
+        result = {
+            "timestamp": timestamp,
+            "position": position
+        }
+        logger.info(f"Motion Event: {result}")
+        return result
 
     @staticmethod
     def get_attribute(text, key):
@@ -82,9 +86,35 @@ class LogParser:
         distance = math.sqrt((x_center - position[0]) ** 2 + (y_center - position[1]) ** 2)
         return distance
 
+    def log_filter(self, tag, keywords):
+        self.log_clear()
+        logger.info("Logcat Filter Start.")
+        cmd = f"adb -s {self.device.serial} shell logcat"
+        output = subprocess.Popen(args=cmd, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
+        with output:
+            for line in output.stdout:
+                line = line.decode("utf-8")
+                if tag in line and self.check_keywords(line, keywords):
+                    self.get_motion_event(line)
+
+    @staticmethod
+    def check_keywords(line, keywords):
+        if len(keywords) == 0:
+            return True
+        else:
+            for keyword in keywords:
+                if keyword not in line:
+                    return False
+            return True
+
+    def log_clear(self):
+        logger.info("Clear logcat.")
+        cmd = ["adb", "-s", self.device.serial, "logcat", "-c"]
+        subprocess.run(cmd)
+
 
 if __name__ == '__main__':
-    logcat = "2022-07-11 20:57:06.552 11160-11160/com.example.appdemo I/MyWindowCallback: dispatchTouchEvent MotionEvent { action=ACTION_UP, actionButton=0, id[0]=0, x[0]=72.0, y[0]=583.0, toolType[0]=TOOL_TYPE_FINGER, buttonState=0, classification=NONE, metaState=0, flags=0x0, edgeFlags=0x0, pointerCount=1, historySize=0, eventTime=31962255, downTime=31962145, deviceId=0, source=0x1002, displayId=0 }"
-    parser = LogParser("MyWindowCallback")
-    hierarchy_path = os.path.join("tmp", "emulator-5554", "hierarchy.xml")
-    parser.view_calculate(logcat, hierarchy_path)
+    dd = Device("emulator-5554")
+    dd.connect()
+    parser = LogParser(dd)
+    parser.log_filter(tag="MyWindowCallback", keywords=["dispatchTouchEvent", "MotionEvent", "action=ACTION_UP"])

@@ -1,3 +1,5 @@
+import subprocess
+
 import uiautomator2 as u2
 import os
 
@@ -43,10 +45,16 @@ class Device:
             f.write(self.d.dump_hierarchy())
         return path
 
+    # def logcat(self):
+    #     cmd = f"adb -s {self.serial} shell logcat"
+    #     output = subprocess.Popen(args=cmd, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
+    #     with output:
+    #         for line in output.stdout:
+    #             print(line)
+    #     return output
 
 
 if __name__ == '__main__':
     dd = Device("emulator-5554")
     dd.connect()
-    # dd.screenshot("test")
-    print(dd.dump_2nd())
+    # dd.logcat()
