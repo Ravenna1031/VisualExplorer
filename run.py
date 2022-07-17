@@ -34,15 +34,13 @@ def main():
     # start a thread to filter logcat.
     thread_filter = threading.Thread(target=parser.log_filter, args=(tag, keywords,))
     thread_filter.start()
-    execution(5)
-    # # start a thread to execute actions
-    # thread_execution = threading.Thread(target=execution, args=(5,))
-    # thread_execution.start()
+    # start execution
+    execution(3)
 
 
 if __name__ == '__main__':
     d = Device("emulator-5554")
-    d.connect()
+    # d.connect()
     parser = LogParser(d)
     ev = Executor.Visual(d)
     ev.connect()

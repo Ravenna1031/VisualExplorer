@@ -76,6 +76,8 @@ class LogParser:
         logger.info(
             f"Calculated View: index={view_cal.index}, text={view_cal.text}, "
             f"resource-id={view_cal.resource_id}, class={view_cal.class_name}")
+        view_info = view_cal.get_all_attributes()
+        Utils.record_sequence(view_info, self.device.sequence_path)
         return view_cal
 
     @staticmethod
@@ -104,7 +106,7 @@ class LogParser:
         self.log_clear()
         logger.info("Logcat Filter Start.")
         cmd = f"adb -s {self.device.serial} shell logcat"
-        output = subprocess.Popen(args=cmd, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
+        output = subprocess.Popen(args=cmd, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         with output:
             for line in output.stdout:
                 line = line.decode("utf-8")
@@ -129,7 +131,7 @@ class LogParser:
 
     def log_clear(self):
         logger.info("Clear logcat.")
-        cmd = ["adb", "-s", self.device.serial, "logcat", "-c"]
+        cmd = ["adb", "-s", self.device.serial, "shell", "logcat", "-c"]
         subprocess.run(cmd)
 
 

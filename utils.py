@@ -1,5 +1,6 @@
-import os.path
+import os
 
+from skimage.metrics import structural_similarity as ssim
 from view import View, Component
 import xml.etree.ElementTree as Et
 import json
@@ -19,7 +20,6 @@ class Utils:
         for p in tree.iter():
             if p.tag == "node":
                 view = View(p)
-                # view.print_attributes()
                 views.append(view)
         return views
 
@@ -39,3 +39,31 @@ class Utils:
                 component = Component(c)
                 components.append(component)
         return components
+
+    @staticmethod
+    def compare_similarity(image_a, image_b):
+        return ssim(image_a, image_b)
+
+    @staticmethod
+    def record_sequence(context, path):
+        path = os.path.join(path, "sequence.json")
+        if not os.path.exists(path):
+            with open(path, "w", encoding="utf-8") as f_w:
+                f_w.write(json.dumps([]))
+            f_w.close()
+        with open(path, "r", encoding="utf-8") as f_r:
+            tmp = json.load(f_r)
+            tmp.append(context)
+            f_r.close()
+            with open(path, "w", encoding="utf-8") as f_rw:
+                f_rw.write(json.dumps(tmp))
+        f_rw.close()
+
+
+if __name__ == '__main__':
+    f_path = os.path.join("Output", "sequence", "emulator-5554")
+    a = {
+        "a": 123,
+        "b": 234
+    }
+    Utils.record_sequence(a, f_path)

@@ -35,25 +35,27 @@ class View:
         res = re.search(matcher, self.bounds)
         return int(res.group(1)), int(res.group(2)), int(res.group(3)), int(res.group(4))
 
-    def print_attributes(self):
-        print("index: " + self.index)
-        print("text: " + self.text)
-        print("resource-id: " + self.resource_id)
-        print("class: " + self.class_name)
-        print("package: " + self.package)
-        print("content-desc: " + self.content_desc)
-        print("checkable: " + self.checkable)
-        print("checked: " + self.checked)
-        print("clickable: " + self.clickable)
-        print("enabled: " + self.enabled)
-        print("focusable: " + self.focusable)
-        print("focused: " + self.focused)
-        print("scrollable: " + self.scrollable)
-        print("long-clickable: " + self.long_clickable)
-        print("password: " + self.password)
-        print("selected: " + self.selected)
-        print("visible_to_user: " + self.visible_to_user)
-        print("bounds: " + self.bounds)
+    def get_all_attributes(self):
+        return {
+            "index": self.index,
+            "text": self.text,
+            "resource-id": self.resource_id,
+            "class": self.class_name,
+            "package": self.package,
+            "content-desc": self.content_desc,
+            "checkable": self.checkable,
+            "checked": self.checked,
+            "clickable": self.clickable,
+            "enabled": self.enabled,
+            "focusable": self.focusable,
+            "focused": self.focused,
+            "scrollable": self.scrollable,
+            "long-clickable": self.long_clickable,
+            "password": self.password,
+            "selected": self.selected,
+            "visible_to_user": self.visible_to_user,
+            "bounds": self.bounds
+        }
 
 
 class Component:

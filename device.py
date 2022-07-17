@@ -12,6 +12,9 @@ class Device:
         self.screenshot_path = os.path.join("Output", "screenshot", self.serial)
         if not os.path.exists(self.screenshot_path):
             os.makedirs(self.screenshot_path)
+        self.sequence_path = os.path.join("Output", "sequence", self.serial)
+        if not os.path.exists(self.sequence_path):
+            os.makedirs(self.sequence_path)
         self.tmp_path = os.path.join("tmp", self.serial)
         if not os.path.exists(self.tmp_path):
             os.makedirs(self.tmp_path)
@@ -41,6 +44,6 @@ class Device:
         :return: The path of the hierarchy xml file.
         """
         path = os.path.join(self.tmp_path, "hierarchy.xml")
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(self.d.dump_hierarchy())
+        # with open(path, "w", encoding="utf-8") as f:
+        #     f.write(self.d.dump_hierarchy())
         return path
