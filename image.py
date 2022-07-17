@@ -1,6 +1,7 @@
 import math
 import time
 import cv2
+import re
 
 
 class Image:
@@ -45,6 +46,15 @@ class Image:
         component_path = self.image_name_insert(image, int(time.time()))
         cv2.imwrite(component_path, component_img)
         return component_path
+
+    def crop_widget(self, view, output_path):
+        matcher = r"\[(\d*),(\d*)\]\[(\d*),(\d*)\]"
+        res = re.search(matcher, view["bounds"])
+        x_min, y_min, x_max, y_max = int(res.group(1)), int(res.group(2)), int(res.group(3)), int(res.group(4))
+        widget = self.image[y_min:y_max, x_min:x_max]
+        widget_path = self.image_name_insert(output_path, "widget")
+        cv2.imwrite(widget_path, widget)
+        return widget_path
 
     @staticmethod
     def image_name_insert(image, text):

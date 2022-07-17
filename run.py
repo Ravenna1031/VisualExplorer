@@ -7,6 +7,7 @@ from device import Device
 from log_parser import LogParser
 from executor import Executor
 from image import Image
+from utils import Utils
 
 
 def execution(event_num):
@@ -26,6 +27,11 @@ def execution(event_num):
         # using the cropped component to interact with the component
         ev.click(cropped_component)
         time.sleep(5)
+        # get interacted view to compare with the 3rd gen component
+        latest_view = Utils.get_latest_view()
+        latest_widget = screenshot.crop_widget(latest_view, cropped_component)
+        # compare the similarity of the view interacted with 2nd and 3rd gen
+        Utils.compare_similarity(cropped_component, latest_widget)
 
 
 def main():
@@ -35,7 +41,7 @@ def main():
     thread_filter = threading.Thread(target=parser.log_filter, args=(tag, keywords,))
     thread_filter.start()
     # start execution
-    execution(3)
+    execution(5)
 
 
 if __name__ == '__main__':

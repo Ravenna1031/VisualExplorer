@@ -4,6 +4,8 @@ from skimage.metrics import structural_similarity as ssim
 from view import View, Component
 import xml.etree.ElementTree as Et
 import json
+from loguru import logger
+import cv2
 
 
 class Utils:
@@ -42,10 +44,34 @@ class Utils:
 
     @staticmethod
     def compare_similarity(image_a, image_b):
-        return ssim(image_a, image_b)
+        """
+        Compare the similarity of two images.
+        :param image_a: The path of image A.
+        :param image_b: The path of image B.
+        :return:
+        """
+        image_a = cv2.imread(image_a)
+        image_b = cv2.imread(image_b)
+        image_a = cv2.cvtColor(image_a, cv2.COLOR_BGR2GRAY)
+        image_b = cv2.cvtColor(image_b, cv2.COLOR_BGR2GRAY)
+        widget_height = image_b.shape[0]
+        widget_width = image_b.shape[1]
+        image_a_resize = cv2.resize(image_a, (widget_width, widget_height), interpolation=cv2.INTER_LINEAR)
+        # cv2.imshow("t1", image_a_resize)
+        # cv2.imshow("t2", image_b)
+        # cv2.waitKey(0)
+        similarity = ssim(image_a_resize, image_b)
+        logger.info("Similarity: " + str(similarity))
+        return similarity
 
     @staticmethod
     def record_sequence(context, path):
+        """
+        Record the sequence in a json file.
+        :param context: One event in the sequence.
+        :param path: The path of the json file.
+        :return:
+        """
         path = os.path.join(path, "sequence.json")
         if not os.path.exists(path):
             with open(path, "w", encoding="utf-8") as f_w:
@@ -59,6 +85,18 @@ class Utils:
                 f_rw.write(json.dumps(tmp))
         f_rw.close()
 
+    @staticmethod
+    def get_latest_view():
+        """
+        Get the latest view from the sequence.
+        :return: The latest view.
+        """
+        path = os.path.join("Output", "sequence", "emulator-5554", "sequence.json")
+        with open(path, "r", encoding="utf-8") as f:
+            j = json.load(f)
+            f.close()
+            return j[-1]
+
 
 if __name__ == '__main__':
     f_path = os.path.join("Output", "sequence", "emulator-5554")
@@ -66,4 +104,4 @@ if __name__ == '__main__':
         "a": 123,
         "b": 234
     }
-    Utils.record_sequence(a, f_path)
+    print(Utils.get_latest_view())
